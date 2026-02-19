@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求质检台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --primary-hover: #2563EB;
+            --danger: #EF4444;
+            --danger-hover: #DC2626;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+
+            --priority-p0: #EF4444;
+            --priority-p1: #F59E0B;
+            --priority-p2: #3B82F6;
+            --priority-p3: #6B7280;
+
+            --status-draft: #6B7280;
+            --status-pending: #3B82F6;
+            --status-confirmed: #14B8A6;
+            --status-ready: #8B5CF6;
+            --status-developing: #F59E0B;
+            --status-done: #22C55E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+        }
+
+        .btn-text {
+            background: transparent;
+            color: var(--primary);
+            padding: 8px 12px;
+        }
+
+        .btn-text:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+            appearance: none;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 0 12px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .filter-spacer {
+            flex: 1;
+        }
+
+        /* Requirement Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .priority-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .priority-p0 { background: #FEE2E2; color: var(--priority-p0); }
+        .priority-p1 { background: #FEF3C7; color: var(--priority-p1); }
+        .priority-p2 { background: #DBEAFE; color: var(--priority-p2); }
+        .priority-p3 { background: var(--gray-100); color: var(--priority-p3); }
+
+        .card-menu {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray-400);
+        }
+
+        .card-menu:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .tag-status {
+            color: white;
+        }
+
+        .status-draft { background: var(--status-draft); }
+        .status-pending { background: var(--status-pending); }
+        .status-confirmed { background: var(--status-confirmed); }
+        .status-ready { background: var(--status-ready); }
+        .status-developing { background: var(--status-developing); }
+        .status-done { background: var(--status-done); }
+
+        .tag-type {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .card-meta {
+            font-size: 13px;
+            color: var(--gray-400);
+            margin-left: auto;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray-500);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            margin-bottom: 24px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray-400);
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .form-error {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 4px;
+        }
+
+        textarea.form-input {
+            min-height: 200px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Markdown Editor */
+        .markdown-editor {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .markdown-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+
+        .markdown-tab {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .markdown-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: white;
+        }
+
+        .markdown-content {
+            min-height: 200px;
+            padding: 16px;
+        }
+
+        .markdown-content textarea {
+            width: 100%;
+            min-height: 180px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .markdown-preview {
+            display: none;
+            padding: 16px;
+        }
+
+        .markdown-preview.active {
+            display: block;
+        }
+
+        .markdown-preview h1 { font-size: 24px; margin-bottom: 16px; }
+        .markdown-preview h2 { font-size: 20px; margin-bottom: 12px; }
+        .markdown-preview h3 { font-size: 16px; margin-bottom: 8px; }
+        .markdown-preview p { margin-bottom: 12px; }
+        .markdown-preview ul, .markdown-preview ol { margin-left: 20px; margin-bottom: 12px; }
+        .markdown-preview code { background: var(--gray-100); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+        /* Detail Page */
+        .detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .detail-meta {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .detail-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .detail-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-meta-label {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .detail-meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .detail-section {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .detail-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* AI Panel */
+        .ai-panel {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0E7FF 100%);
+            border: 1px solid #BFDBFE;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .ai-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-time {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .ai-status {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+        }
+
+        .ai-status.success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .ai-status.warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .ai-suggestions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ai-suggestion {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .ai-suggestion-type {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .ai-suggestion-type.completeness { background: #DBEAFE; color: #1E40AF; }
+        .ai-suggestion-type.clarity { background: #FEF3C7; color: #92400E; }
+        .ai-suggestion-type.logic { background: #FEE2E2; color: #991B1B; }
+        .ai-suggestion-type.task { background: #EDE9FE; color: #5B21B6; }
+
+        .ai-suggestion-msg {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .ai-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Config Page */
+        .config-header {
+            margin-bottom: 24px;
+        }
+
+        .config-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .config-desc {
+            color: var(--gray-600);
+        }
+
+        .config-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .config-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .config-card-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .config-card-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .config-card-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .config-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .config-card-label {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .config-card-value {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .config-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--gray-800);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+
+        /* Back Button */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--gray-600);
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            color: var(--gray-800);
+        }
+
+        /* Status Change */
+        .status-change {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .status-current {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+            }
+
+            .header-left {
+                gap: 16px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .main {
+                padding: 16px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            .filter-spacer {
+                display: none;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Template Tips */
+        .template-tip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #0369A1;
+        }
+
+        /* Design Link */
+        .design-link-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .design-link-input input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">📋</div>
+                需求质检台
+            </div>
+            <nav class="nav">
+                <div class="nav-item active" data-page="list">需求列表</div>
+                <div class="nav-item" data-page="config">AI 配置</div>
+            </nav>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-text" onclick="refreshData()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                刷新
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- List Page -->
+        <div id="page-list">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <span class="filter-label">状态:</span>
+                    <select class="select" id="filter-status">
+                        <option value="">全部</option>
+                        <option value="草稿">草稿</option>
+                        <option value="待检查">待检查</option>
+                        <option value="确认完善">确认完善</option>
+                        <option value="待开发">待开发</option>
+                        <option value="开发中">开发中</option>
+                        <option value="已完成">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">优先级:</span>
+                    <select class="select" id="filter-priority">
+                        <option value="">全部</option>
+                        <option value="P0">P0</option>
+                        <option value="P1">P1</option>
+                        <option value="P2">P2</option>
+                        <option value="P3">P3</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" placeholder="搜索需求..." id="search-input">
+                </div>
+                <div class="filter-spacer"></div>
+                <button class="btn btn-primary" onclick="showCreateModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    新建需求
+                </button>
+            </div>
+
+            <div class="cards-grid" id="cards-container">
+                <!-- Cards will be rendered by JS -->
+            </div>
+        </div>
+
+        <!-- Detail Page -->
+        <div id="page-detail" class="hidden">
+            <div class="back-btn" onclick="showListPage()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                返回列表
+            </div>
+
+            <div class="detail-header">
+                <h1 class="detail-title" id="detail-title">需求标题</h1>
+                <div class="detail-actions">
+                    <button class="btn btn-secondary" onclick="showEditModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        编辑
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmDelete()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        删除
+                    </button>
+                </div>
+            </div>
+
+            <div class="detail-meta">
+                <div class="detail-meta-grid">
+                    <div class="detail-meta-item">
+                        <span class="detail-meta-label">优先级</span>
+                        <span class="detail-meta-value"><span class="priority-badge priority-p2" id="detail-priority">P2</span></span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-meta-label">类型</span>
+                        <span class="detail-meta-value" id="detail-type">新功能</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-meta-label">状态</span>
+                        <span class="detail-meta-value"><span class="tag tag-status status-pending" id="detail-status">待检查</span></span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-meta-label">创建人</span>
+                        <span class="detail-meta-value" id="detail-creator">张三</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-meta-label">创建时间</span>
+                        <span class="detail-meta-value" id="detail-created">2024-01-15 10:30</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-meta-label">设计图</span>
+                        <span class="detail-meta-value"><a href="#" id="detail-design" style="color: var(--primary);">查看链接</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">需求描述</h3>
+                <div class="markdown-preview active" id="detail-desc">
+                    <!-- Rendered markdown -->
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="ai-panel">
+                    <div class="ai-header">
+                        <div class="ai-title">
+                            🤖 AI 检查结果
+                        </div>
+                        <div class="ai-time" id="ai-check-time">10:30</div>
+                    </div>
+                    <div class="ai-status warning" id="ai-status-badge">⚠️ 发现 3 个建议</div>
+                    <div class="ai-suggestions" id="ai-suggestions">
+                        <!-- AI suggestions -->
+                    </div>
+                    <div class="ai-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="runAICheck()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                            重新检查
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="confirmComplete()">
+                            确认完善
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">状态变更</h3>
+                <div class="status-change">
+                    <span class="status-current">当前状态: <strong id="current-status">待检查</strong></span>
+                    <div class="filter-spacer"></div>
+                    <button class="btn btn-primary btn-sm" onclick="changeStatus()">确认完善</button>
+                    <select class="select" id="status-select">
+                        <option value="">改为...</option>
+                        <option value="待开发">待开发</option>
+                        <option value="开发中">开发中</option>
+                        <option value="已完成">已完成</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Config Page -->
+        <div id="page-config" class="hidden">
+            <div class="config-header">
+                <h2 class="config-title">AI 配置</h2>
+                <p class="config-desc">管理 AI 模型配置，支持 OpenAI、Claude、智谱等多种模型</p>
+            </div>
+
+            <div class="config-card">
+                <div class="config-card-header">
+                    <span class="config-card-name">OpenAI GPT-4</span>
+                    <span class="config-card-badge">默认</span>
+                </div>
+                <div class="config-card-body">
+                    <div class="config-card-item">
+                        <span class="config-card-label">类型</span>
+                        <span class="config-card-value">OpenAI</span>
+                    </div>
+                    <div class="config-card-item">
+                        <span class="config-card-label">模型</span>
+                        <span class="config-card-value">gpt-4o</span>
+                    </div>
+                    <div class="config-card-item">
+                        <span class="config-card-label">API 地址</span>
+                        <span class="config-card-value">https://api.openai.com/v1</span>
+                    </div>
+                </div>
+                <div class="config-card-actions">
+                    <button class="btn btn-secondary btn-sm">编辑</button>
+                    <button class="btn btn-text btn-sm" style="color: var(--danger);">删除</button>
+                </div>
+            </div>
+
+            <div class="config-card">
+                <div class="config-card-header">
+                    <span class="config-card-name">Claude 3.5 Sonnet</span>
+                </div>
+                <div class="config-card-body">
+                    <div class="config-card-item">
+                        <span class="config-card-label">类型</span>
+                        <span class="config-card-value">Claude</span>
+                    </div>
+                    <div class="config-card-item">
+                        <span class="config-card-label">模型</span>
+                        <span class="config-card-value">claude-3-5-sonnet-20241022</span>
+                    </div>
+                    <div class="config-card-item">
+                        <span class="config-card-label">API 地址</span>
+                        <span class="config-card-value">https://api.anthropic.com</span>
+                    </div>
+                </div>
+                <div class="config-card-actions">
+                    <button class="btn btn-secondary btn-sm">设为默认</button>
+                    <button class="btn btn-secondary btn-sm">编辑</button>
+                    <button class="btn btn-text btn-sm" style="color: var(--danger);">删除</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="showAddConfigModal()" style="margin-top: 16px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                添加配置
+            </button>
+        </div>
+    </main>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">新建需求</h3>
+                <div class="modal-close" onclick="closeCreateModal()">✕</div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label required">需求标题</label>
+                    <input type="text" class="form-input" id="input-title" placeholder="请输入需求标题">
+                    <div class="form-error hidden" id="title-error">请输入需求标题</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">需求描述</label>
+                    <div class="template-tip">
+                        💡 建议使用模板编写，结构更清晰
+                        <button class="btn btn-text btn-sm" onclick="insertTemplate()">使用模板</button>
+                    </div>
+                    <div class="markdown-editor">
+                        <div class="markdown-tabs">
+                            <div class="markdown-tab active" data-tab="write">源码</div>
+                            <div class="markdown-tab" data-tab="preview" onclick="previewMarkdown()">预览</div>
+                        </div>
+                        <div class="markdown-content">
+                            <textarea id="input-desc" placeholder="请输入需求描述..."></textarea>
+                        </div>
+                        <div class="markdown-preview" id="markdown-preview"></div>
+                    </div>
+                    <div class="form-error hidden" id="desc-error">请输入需求描述（至少10字符）</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">设计图链接</label>
+                    <div class="design-link-input">
+                        <input type="text" class="form-input" id="input-design" placeholder="https://figma.com/file/...">
+                        <button class="btn btn-secondary btn-sm">打开链接</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required">优先级</label>
+                        <select class="select" id="input-priority" style="width: 100%;">
+                            <option value="">请选择</option>
+                            <option value="P0">P0 - 紧急</option>
+                            <option value="P1">P1 - 高</option>
+                            <option value="P2">P2 - 中</option>
+                            <option value="P3">P3 - 低</option>
+                        </select>
+                        <div class="form-error hidden" id="priority-error">请选择优先级</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">需求类型</label>
+                        <select class="select" id="input-type" style="width: 100%;">
+                            <option value="">请选择</option>
+                            <option value="新功能">新功能</option>
+                            <option value="缺陷修复">缺陷修复</option>
+                            <option value="体验优化">体验优化</option>
+                        </select>
+                        <div class="form-error hidden" id="type-error">请选择需求类型</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="saveAsDraft()">保存草稿</button>
+                <button class="btn btn-primary" onclick="submitForCheck()">提交检查</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">确认删除</h3>
+                <div class="modal-close" onclick="closeDeleteModal()">✕</div>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除"<span id="delete-title">需求标题</span>"吗？</p>
+                <p style="color: var(--gray-500); font-size: 14px; margin-top: 8px;">此操作不可恢复。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="deleteRequirement()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Config Modal -->
+    <div class="modal-overlay" id="config-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">添加 AI 配置</h3>
+                <div class="modal-close" onclick="closeConfigModal()">✕</div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label required">配置名称</label>
+                    <input type="text" class="form-input" placeholder="请输入配置名称">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">模型类型</label>
+                    <select class="select" style="width: 100%;">
+                        <option value="">请选择</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="claude">Claude</option>
+                        <option value="zhipu">智谱 GLM</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">API 地址</label>
+                    <input type="text" class="form-input" placeholder="https://api.openai.com/v1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">模型名称</label>
+                    <input type="text" class="form-input" placeholder="gpt-4o">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">API Key</label>
+                    <input type="password" class="form-input" placeholder="sk-...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeConfigModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveConfig()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toast-icon">✓</span>
+        <span id="toast-msg">操作成功</span>
+    </div>
+
+    <script>
+        // Data
+        let requirements = [
+            {
+                id: '1',
+                title: '用户登录功能优化',
+                description: '## 功能描述\n\n优化用户登录流程，提供更好的用户体验。\n\n## 用户场景\n- 用户正常登录\n- 用户忘记密码\n\n## 边界情况\n- 网络异常\n- 账号不存在',
+                designLink: 'https://figma.com/file/xxx',
+                priority: 'P0',
+                reqType: '新功能',
+                status: '待检查',
+                createdBy: '张三',
+                createdAt: '2024-01-15 10:30',
+                aiResult: {
+                    passed: false,
+                    suggestions: [
+                        { type: '完整度', message: '缺少边界情况说明' },
+                        { type: '清晰度', message: '第2步的交互没有说清楚' },
+                        { type: '分工', message: '建议说明后端接口要返回什么' }
+                    ],
+                    checkedAt: '10:30'
+                }
+            },
+            {
+                id: '2',
+                title: '首页UI优化',
+                description: '优化首页布局，提升用户体验。',
+                designLink: '',
+                priority: 'P2',
+                reqType: '体验优化',
+                status: '已完成',
+                createdBy: '李四',
+                createdAt-01-14: '2024 15:20',
+                aiResult: null
+            },
+            {
+                id: '3',
+                title: '修复崩溃问题',
+                description: '修复某些机型上的崩溃问题。',
+                designLink: '',
+                priority: 'P1',
+                reqType: '缺陷修复',
+                status: '开发中',
+                createdBy: '王五',
+                createdAt: '2024-01-13 09:00',
+                aiResult: null
+            }
+        ];
+
+        let currentDetailId = null;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    const page = item.dataset.page;
+                    document.getElementById('page-list').classList.toggle('hidden', page !== 'list');
+                    document.getElementById('page-detail').classList.toggle('hidden', page !== 'detail');
+                    document.getElementById('page-config').classList.toggle('hidden', page !== 'config');
+                });
+            });
+
+            // Filter
+            document.getElementById('filter-status').addEventListener('change', renderCards);
+            document.getElementById('filter-priority').addEventListener('change', renderCards);
+            document.getElementById('search-input').addEventListener('input', renderCards);
+
+            // Markdown tabs
+            document.querySelectorAll('.markdown-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.markdown-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const tabName = tab.dataset.tab;
+                    if (tabName === 'preview') {
+                        previewMarkdown();
+                        document.querySelector('.markdown-content').style.display = 'none';
+                        document.getElementById('markdown-preview').classList.add('active');
+                    } else {
+                        document.querySelector('.markdown-content').style.display = 'block';
+                        document.getElementById('markdown-preview').classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        // Render
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            const statusFilter = document.getElementById('filter-status').value;
+            const priorityFilter = document.getElementById('filter-priority').value;
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = requirements.filter(r => {
+                if (statusFilter && r.status !== statusFilter) return false;
+                if (priorityFilter && r.priority !== priorityFilter) return false;
+                if (keyword && !r.title.toLowerCase().includes(keyword)) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-title">暂无需求</div>
+                        <div class="empty-desc">点击下方按钮创建第一个需求</div>
+                        <button class="btn btn-primary" onclick="showCreateModal()">+ 新建第一个需求</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(r => `
+                <div class="card" onclick="showDetail('${r.id}')">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="priority-badge priority-${r.priority.toLowerCase()}">${r.priority}</span>
+                            ${r.title}
+                        </div>
+                        <div class="card-menu" onclick="event.stopPropagation()">⋮</div>
+                    </div>
+                    <div class="card-desc">${r.description.replace(/[#*`\n]/g, ' ').substring(0, 100)}...</div>
+                    <div class="card-footer">
+                        <span class="tag tag-status status-${getStatusClass(r.status)}">${r.status}</span>
+                        <span class="tag tag-type">${r.reqType}</span>
+                        <span class="card-meta">${r.createdBy} · ${r.createdAt}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                '草稿': 'draft',
+                '待检查': 'pending',
+                '确认完善': 'confirmed',
+                '待开发': 'ready',
+                '开发中': 'developing',
+                '已完成': 'done'
+            };
+            return map[status] || 'draft';
+        }
+
+        // Pages
+        function showListPage() {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector('.nav-item[data-page="list"]').classList.add('active');
+            document.getElementById('page-list').classList.remove('hidden');
+            document.getElementById('page-detail').classList.add('hidden');
+            document.getElementById('page-config').classList.add('hidden');
+            renderCards();
+        }
+
+        function showDetail(id) {
+            const req = requirements.find(r => r.id === id);
+            if (!req) return;
+
+            currentDetailId = id;
+
+            document.getElementById('page-list').classList.add('hidden');
+            document.getElementById('page-detail').classList.remove('hidden');
+            document.getElementById('page-config').classList.add('hidden');
+
+            // Fill detail
+            document.getElementById('detail-title').textContent = req.title;
+            document.getElementById('detail-priority').textContent = req.priority;
+            document.getElementById('detail-priority').className = `priority-badge priority-${req.priority.toLowerCase()}`;
+            document.getElementById('detail-type').textContent = req.reqType;
+            document.getElementById('detail-status').textContent = req.status;
+            document.getElementById('detail-status').className = `tag tag-status status-${getStatusClass(req.status)}`;
+            document.getElementById('detail-creator').textContent = req.createdBy;
+            document.getElementById('detail-created').textContent = req.createdAt;
+            document.getElementById('detail-design').href = req.designLink || '#';
+            document.getElementById('detail-design').textContent = req.designLink ? '查看链接' : '-';
+
+            // Render description
+            const descHtml = req.description
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^\- (.+)$/gm, '<li>$1</li>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            document.getElementById('detail-desc').innerHTML = `<p>${descHtml}</p>`;
+
+            // AI Result
+            const aiResult = req.aiResult;
+            if (aiResult && aiResult.suggestions.length > 0) {
+                document.getElementById('ai-status-badge').textContent = `⚠️ 发现 ${aiResult.suggestions.length} 个建议`;
+                document.getElementById('ai-status-badge').className = 'ai-status warning';
+                document.getElementById('ai-check-time').textContent = aiResult.checkedAt;
+
+                document.getElementById('ai-suggestions').innerHTML = aiResult.suggestions.map(s => `
+                    <div class="ai-suggestion">
+                        <span class="ai-suggestion-type ${getSuggestionTypeClass(s.type)}">${s.type}</span>
+                        <span class="ai-suggestion-msg">${s.message}</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('ai-status-badge').textContent = '✅ 看起来不错！';
+                document.getElementById('ai-status-badge').className = 'ai-status success';
+                document.getElementById('ai-suggestions').innerHTML = '<p style="color: var(--gray-600);">文档结构完整，描述清晰</p>';
+            }
+
+            document.getElementById('current-status').textContent = req.status;
+        }
+
+        function getSuggestionTypeClass(type) {
+            const map = {
+                '完整度': 'completeness',
+                '清晰度': 'clarity',
+                '逻辑': 'logic',
+                '分工': 'task'
+            };
+            return map[type] || 'completeness';
+        }
+
+        // Modal
+        function showCreateModal() {
+            document.getElementById('create-modal').classList.add('active');
+            document.getElementById('modal-title').textContent = '新建需求';
+            clearForm();
+        }
+
+        function closeCreateModal() {
+            document.getElementById('create-modal').classList.remove('active');
+        }
+
+        function clearForm() {
+            document.getElementById('input-title').value = '';
+            document.getElementById('input-desc').value = '';
+            document.getElementById('input-design').value = '';
+            document.getElementById('input-priority').value = '';
+            document.getElementById('input-type').value = '';
+            document.querySelectorAll('.form-error').forEach(e => e.classList.add('hidden'));
+            document.querySelectorAll('.form-input').forEach(i => i.classList.remove('error'));
+        }
+
+        function showEditModal() {
+            const req = requirements.find(r => r.id === currentDetailId);
+            if (!req) return;
+
+            document.getElementById('create-modal').classList.add('active');
+            document.getElementById('modal-title').textContent = '编辑需求';
+
+            document.getElementById('input-title').value = req.title;
+            document.getElementById('input-desc').value = req.description;
+            document.getElementById('input-design').value = req.designLink || '';
+            document.getElementById('input-priority').value = req.priority;
+            document.getElementById('input-type').value = req.reqType;
+        }
+
+        function showAddConfigModal() {
+            document.getElementById('config-modal').classList.add('active');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.remove('active');
+        }
+
+        function confirmDelete() {
+            const req = requirements.find(r => r.id === currentDetailId);
+            document.getElementById('delete-title').textContent = req.title;
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('active');
+        }
+
+        // Actions
+        function saveAsDraft() {
+            const title = document.getElementById('input-title').value.trim();
+            const desc = document.getElementById('input-desc').value.trim();
+            const priority = document.getElementById('input-priority').value;
+            const type = document.getElementById('input-type').value;
+
+            if (!validateForm()) return;
+
+            const newReq = {
+                id: Date.now().toString(),
+                title,
+                description: desc,
+                designLink: document.getElementById('input-design').value,
+                priority: priority || 'P2',
+                reqType: type || '新功能',
+                status: '草稿',
+                createdBy: '当前用户',
+                createdAt: new Date().toLocaleString('zh-CN'),
+                aiResult: null
+            };
+
+            requirements.unshift(newReq);
+            closeCreateModal();
+            renderCards();
+            showToast('已保存为草稿', 'success');
+        }
+
+        function submitForCheck() {
+            if (!validateForm()) return;
+
+            const title = document.getElementById('input-title').value.trim();
+            const desc = document.getElementById('input-desc').value.trim();
+            const priority = document.getElementById('input-priority').value;
+            const type = document.getElementById('input-type').value;
+
+            const newReq = {
+                id: Date.now().toString(),
+                title,
+                description: desc,
+                designLink: document.getElementById('input-design').value,
+                priority: priority || 'P2',
+                reqType: type || '新功能',
+                status: '待检查',
+                createdBy: '当前用户',
+                createdAt: new Date().toLocaleString('zh-CN'),
+                aiResult: {
+                    passed: false,
+                    suggestions: [
+                        { type: '完整度', message: '缺少边界情况说明' },
+                        { type: '清晰度', message: '第2步的交互没有说清楚' }
+                    ],
+                    checkedAt: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                }
+            };
+
+            requirements.unshift(newReq);
+            closeCreateModal();
+            showListPage();
+            showDetail(newReq.id);
+            showToast('已提交 AI 检查', 'success');
+        }
+
+        function validateForm() {
+            let valid = true;
+
+            const title = document.getElementById('input-title').value.trim();
+            const desc = document.getElementById('input-desc').value.trim();
+            const priority = document.getElementById('input-priority').value;
+            const type = document.getElementById('input-type').value;
+
+            if (!title) {
+                document.getElementById('input-title').classList.add('error');
+                document.getElementById('title-error').classList.remove('hidden');
+                valid = false;
+            } else {
+                document.getElementById('input-title').classList.remove('error');
+                document.getElementById('title-error').classList.add('hidden');
+            }
+
+            if (!desc || desc.length < 10) {
+                document.getElementById('input-desc').classList.add('error');
+                document.getElementById('desc-error').classList.remove('hidden');
+                valid = false;
+            } else {
+                document.getElementById('input-desc').classList.remove('error');
+                document.getElementById('desc-error').classList.add('hidden');
+            }
+
+            if (!priority) {
+                document.getElementById('input-priority').style.borderColor = 'var(--danger)';
+                document.getElementById('priority-error').classList.remove('hidden');
+                valid = false;
+            } else {
+                document.getElementById('input-priority').style.borderColor = '';
+                document.getElementById('priority-error').classList.add('hidden');
+            }
+
+            if (!type) {
+                document.getElementById('input-type').style.borderColor = 'var(--danger)';
+                document.getElementById('type-error').classList.remove('hidden');
+                valid = false;
+            } else {
+                document.getElementById('input-type').style.borderColor = '';
+                document.getElementById('type-error').classList.add('hidden');
+            }
+
+            return valid;
+        }
+
+        function insertTemplate() {
+            const template = `## 功能描述
+[一句话说明这个功能做什么]
+
+## 用户场景
+- 场景1：用户 XXX 时，XXX
+- 场景2：XXX
+
+## 交互流程
+1. 用户进入 XX 页面
+2. 点击 XX 按钮
+3. 系统 XX
+
+## 边界/异常情况
+- 网络异常如何处理
+- 数据为空如何显示
+- 权限不足如何提示
+
+## UI 要求
+[控件状态、动画效果等]
+
+## 后端要求
+[接口格式、数据结构等]`;
+
+            document.getElementById('input-desc').value = template;
+        }
+
+        function previewMarkdown() {
+            const md = document.getElementById('input-desc').value;
+            const html = md
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^\- (.+)$/gm, '<li>$1</li>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            document.getElementById('markdown-preview').innerHTML = `<p>${html}</p>`;
+        }
+
+        function deleteRequirement() {
+            requirements = requirements.filter(r => r.id !== currentDetailId);
+            closeDeleteModal();
+            showListPage();
+            showToast('已删除', 'success');
+        }
+
+        function runAICheck() {
+            showToast('正在调用 AI 检查...', 'warning');
+            setTimeout(() => {
+                showToast('AI 检查完成', 'success');
+            }, 1500);
+        }
+
+        function confirmComplete() {
+            const req = requirements.find(r => r.id === currentDetailId);
+            if (req) {
+                req.status = '确认完善';
+                showDetail(currentDetailId);
+                showToast('已确认完善', 'success');
+            }
+        }
+
+        function changeStatus() {
+            const newStatus = document.getElementById('status-select').value;
+            if (!newStatus) return;
+
+            const req = requirements.find(r => r.id === currentDetailId);
+            if (req) {
+                req.status = newStatus;
+                showDetail(currentDetailId);
+                showToast(`已改为 ${newStatus}`, 'success');
+            }
+        }
+
+        function saveConfig() {
+            closeConfigModal();
+            showToast('配置已保存', 'success');
+        }
+
+        function refreshData() {
+            showToast('数据已刷新', 'success');
+        }
+
+        // Toast
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msgEl = document.getElementById('toast-msg');
+
+            toast.className = `toast ${type}`;
+            icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+            msgEl.textContent = msg;
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
